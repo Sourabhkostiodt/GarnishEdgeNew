@@ -26,9 +26,9 @@ const LoginVerification: React.FC = () => {
             addStep(`Using credentials: ${email} / ${password}`);
 
             const result = await login(email, password);
-            addStep(`Login result: ${result.success ? 'SUCCESS' : 'FAILED'}`);
+            addStep(`Login result: ${result ? 'SUCCESS' : 'FAILED'}`);
 
-            if (result.success) {
+            if (result) {
                 addStep('✅ Login successful!');
                 addStep(`✅ Token stored: ${localStorage.getItem('authToken') ? 'YES' : 'NO'}`);
                 addStep(`✅ User authenticated: ${isAuthenticated ? 'YES' : 'NO'}`);
@@ -36,7 +36,7 @@ const LoginVerification: React.FC = () => {
                 addStep('✅ Success message should appear in green');
                 addStep('✅ Redirecting to /analytics in 1 second...');
             } else {
-                addStep(`❌ Login failed: ${result.message}`);
+                addStep('❌ Login failed');
             }
         } catch (error) {
             addStep(`❌ Error: ${error}`);

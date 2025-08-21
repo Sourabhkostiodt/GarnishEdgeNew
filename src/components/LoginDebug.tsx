@@ -13,19 +13,17 @@ const LoginDebug: React.FC = () => {
     };
 
     const handleTestLogin = async () => {
+        addLog('Testing login with real API...');
         try {
-            addLog('Starting login test...');
-            addLog(`Email: ${email}, Password: ${password}`);
-
             const result = await login(email, password);
-            addLog(`Login result: ${JSON.stringify(result)}`);
+            addLog(`Login result: ${result}`);
 
-            if (result.success) {
+            if (result) {
                 addLog('Login successful!');
                 addLog(`User authenticated: ${isAuthenticated}`);
                 addLog(`User data: ${JSON.stringify(user)}`);
             } else {
-                addLog(`Login failed: ${result.message}`);
+                addLog('Login failed');
             }
         } catch (error) {
             addLog(`Error: ${error}`);

@@ -219,7 +219,7 @@ const Order = () => {
 
     // Generate dynamic columns for all available fields
     const generateDynamicColumns = () => {
-        if (!records[0]) return [];
+        if (!records || records.length === 0) return [];
 
         return Object.keys(records[0])
             .filter(key => !['id', 'action', 'actions'].includes(key))
@@ -227,7 +227,8 @@ const Order = () => {
                 accessor: key,
                 title: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
                 sortable: true,
-                render: ({ [key]: value }) => {
+                render: (record: any) => {
+                    const value = record[key];
                     if (typeof value === 'boolean') {
                         return (
                             <span className={`badge badge-outline-${value ? 'success' : 'danger'}`}>
@@ -235,7 +236,7 @@ const Order = () => {
                             </span>
                         );
                     }
-                    if (typeof value === 'number' && key.includes('amount') || key.includes('pay')) {
+                    if (typeof value === 'number' && (key.includes('amount') || key.includes('pay'))) {
                         return <span className="font-semibold">{formatCurrency(value)}</span>;
                     }
                     if (typeof value === 'string' && (key.includes('amount') || key.includes('pay'))) {
@@ -296,15 +297,15 @@ const Order = () => {
                                 title: 'Actions',
                                 sortable: false,
                                 textAlignment: 'center',
-                                render: ({ id }) => (
+                                render: (record: any) => (
                                     <div className="flex gap-4 items-center w-max mx-auto">
-                                        <NavLink to={`/apps/employee/edit/${id}`} className="flex hover:text-info">
+                                        <NavLink to={`/apps/employee/edit/${record.id}`} className="flex hover:text-info">
                                             <IconEdit className="w-4.5 h-4.5" />
                                         </NavLink>
-                                        <NavLink to={`/apps/employee/view/${id}`} className="flex hover:text-primary">
+                                        <NavLink to={`/apps/employee/view/${record.id}`} className="flex hover:text-primary">
                                             <IconEye />
                                         </NavLink>
-                                        <button type="button" className="flex hover:text-danger" onClick={(e) => deleteRow(id)}>
+                                        <button type="button" className="flex hover:text-danger" onClick={(e) => deleteRow(record.id)}>
                                             <IconTrashLines />
                                         </button>
                                     </div>
@@ -315,16 +316,16 @@ const Order = () => {
                                 accessor: 'eeid',
                                 title: 'Employee ID',
                                 sortable: true,
-                                render: ({ eeid }) => (
-                                    <div className="text-primary underline hover:no-underline font-semibold">{eeid}</div>
+                                render: (record: any) => (
+                                    <div className="text-primary underline hover:no-underline font-semibold">{record.eeid}</div>
                                 ),
                             },
                             {
                                 accessor: 'fein',
                                 title: 'FEIN',
                                 sortable: true,
-                                render: ({ fein }) => (
-                                    <span>{fein === 'nan' ? 'N/A' : fein}</span>
+                                render: (record: any) => (
+                                    <span>{record.fein === 'nan' ? 'N/A' : record.fein}</span>
                                 ),
                             },
                             {
@@ -341,8 +342,8 @@ const Order = () => {
                                 accessor: 'type',
                                 title: 'Garnishment Type',
                                 sortable: true,
-                                render: ({ type }) => (
-                                    <span className="badge badge-outline-primary">{type}</span>
+                                render: (record: any) => (
+                                    <span className="badge badge-outline-primary">{record.type}</span>
                                 ),
                             },
                             {
@@ -354,33 +355,33 @@ const Order = () => {
                                 accessor: 'start_date',
                                 title: 'Start Date',
                                 sortable: true,
-                                render: ({ start_date }) => (
-                                    <span>{start_date ? new Date(start_date).toLocaleDateString() : 'N/A'}</span>
+                                render: (record: any) => (
+                                    <span>{record.start_date ? new Date(record.start_date).toLocaleDateString() : 'N/A'}</span>
                                 ),
                             },
                             {
                                 accessor: 'end_date',
                                 title: 'End Date',
                                 sortable: true,
-                                render: ({ end_date }) => (
-                                    <span>{end_date ? new Date(end_date).toLocaleDateString() : 'N/A'}</span>
+                                render: (record: any) => (
+                                    <span>{record.end_date ? new Date(record.end_date).toLocaleDateString() : 'N/A'}</span>
                                 ),
                             },
                             {
                                 accessor: 'amount',
                                 title: 'Amount',
                                 sortable: true,
-                                render: ({ amount }) => (
-                                    <span className="font-semibold text-danger">{formatCurrency(amount)}</span>
+                                render: (record: any) => (
+                                    <span className="font-semibold text-danger">{formatCurrency(record.amount)}</span>
                                 ),
                             },
                             {
                                 accessor: 'arrear_greater_than_12_weeks',
                                 title: 'Arrear > 12 Weeks',
                                 sortable: true,
-                                render: ({ arrear_greater_than_12_weeks }) => (
-                                    <span className={`badge badge-outline-${arrear_greater_than_12_weeks ? 'danger' : 'success'}`}>
-                                        {arrear_greater_than_12_weeks ? 'Yes' : 'No'}
+                                render: (record: any) => (
+                                    <span className={`badge badge-outline-${record.arrear_greater_than_12_weeks ? 'danger' : 'success'}`}>
+                                        {record.arrear_greater_than_12_weeks ? 'Yes' : 'No'}
                                     </span>
                                 ),
                             },
@@ -388,16 +389,16 @@ const Order = () => {
                                 accessor: 'arrear_amount',
                                 title: 'Arrear Amount',
                                 sortable: true,
-                                render: ({ arrear_amount }) => (
-                                    <span className="font-semibold">{formatCurrency(arrear_amount)}</span>
+                                render: (record: any) => (
+                                    <span className="font-semibold">{formatCurrency(record.arrear_amount)}</span>
                                 ),
                             },
                             {
                                 accessor: 'record_updated',
                                 title: 'Last Updated',
                                 sortable: true,
-                                render: ({ record_updated }) => (
-                                    <span>{record_updated ? new Date(record_updated).toLocaleString() : 'N/A'}</span>
+                                render: (record: any) => (
+                                    <span>{record.record_updated ? new Date(record.record_updated).toLocaleString() : 'N/A'}</span>
                                 ),
                             },
                             {
@@ -405,20 +406,20 @@ const Order = () => {
                                 title: 'Actions',
                                 sortable: false,
                                 textAlignment: 'center',
-                                render: ({ id }) => (
+                                render: (record: any) => (
                                     <div className="flex gap-4 items-center w-max mx-auto">
-                                        <NavLink to={`/apps/employee/edit/${id}`} className="flex hover:text-info">
+                                        <NavLink to={`/apps/employee/edit/${record.id}`} className="flex hover:text-info">
                                             <IconEdit className="w-4.5 h-4.5" />
                                         </NavLink>
-                                        <NavLink to={`/apps/employee/view/${id}`} className="flex hover:text-primary">
+                                        <NavLink to={`/apps/employee/view/${record.id}`} className="flex hover:text-primary">
                                             <IconEye />
                                         </NavLink>
-                                        <button type="button" className="flex hover:text-danger" onClick={(e) => deleteRow(id)}>
+                                        <button type="button" className="flex hover:text-danger" onClick={(e) => deleteRow(record.id)}>
                                             <IconTrashLines />
                                         </button>
                                     </div>
                                 ),
-                            },
+                            }
                         ]}
                         highlightOnHover
                         totalRecords={initialRecords.length}
