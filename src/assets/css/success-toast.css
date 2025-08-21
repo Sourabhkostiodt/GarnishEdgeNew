@@ -1,0 +1,36 @@
+/* Custom Success Toast Styling */
+.swal2-success-toast {
+    background-color: #10b981 !important;
+    border: 2px solid #059669 !important;
+    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3) !important;
+}
+
+.swal2-success-title {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+}
+
+.swal2-success-icon {
+    color: #ffffff !important;
+}
+
+/* Enhanced green styling for success messages */
+.swal2-toast.swal2-icon-success {
+    background-color: #10b981 !important;
+    color: #ffffff !important;
+}
+
+.swal2-toast.swal2-icon-success .swal2-title {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+.swal2-toast.swal2-icon-success .swal2-icon {
+    color: #ffffff !important;
+}
+
+/* Progress bar styling */
+.swal2-timer-progress-bar {
+    background-color: #059669 !important;
+}
