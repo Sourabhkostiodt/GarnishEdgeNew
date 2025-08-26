@@ -31,61 +31,80 @@ const Settings = () => {
         }
     }, [dispatch]);
 
+    // Helper function to get user-specific storage key
+    const getUserStorageKey = (key: string) => {
+        const userId = localStorage.getItem('user-id') || 'default-user';
+        return `${key}-${userId}`;
+    };
+
+    // Helper function to get user-specific setting
+    const getUserSetting = (key: string, defaultValue: any) => {
+        const storageKey = getUserStorageKey(key);
+        const stored = localStorage.getItem(storageKey);
+        return stored ? JSON.parse(stored) : defaultValue;
+    };
+
+    // Helper function to set user-specific setting
+    const setUserSetting = (key: string, value: any) => {
+        const storageKey = getUserStorageKey(key);
+        localStorage.setItem(storageKey, JSON.stringify(value));
+    };
+
     const [settings, setSettings] = useState({
         // General Settings
-        companyName: 'GarnishEdge',
-        companyEmail: 'admin@garnishedge.com',
-        timezone: localStorage.getItem('userTimezone') || Intl.DateTimeFormat().resolvedOptions().timeZone,
-        dateFormat: 'MM/DD/YYYY',
-        timeFormat: '12h',
-        language: 'en',
-        showUserInterfaceMenu: localStorage.getItem('showUserInterfaceMenu') !== 'false', // Default to true unless explicitly set to false
+        companyName: getUserSetting('companyName', 'GarnishEdge'),
+        companyEmail: getUserSetting('companyEmail', 'admin@garnishedge.com'),
+        timezone: getUserSetting('userTimezone', Intl.DateTimeFormat().resolvedOptions().timeZone),
+        dateFormat: getUserSetting('dateFormat', 'MM/DD/YYYY'),
+        timeFormat: getUserSetting('timeFormat', '12h'),
+        language: getUserSetting('language', 'en'),
+        showUserInterfaceMenu: getUserSetting('showUserInterfaceMenu', true),
 
         // Global Currency Settings
-        globalCurrency: localStorage.getItem('globalCurrency') || 'USD',
-        currencySymbol: localStorage.getItem('currencySymbol') || '$',
-        currencyPosition: localStorage.getItem('currencyPosition') || 'before',
-        decimalPlaces: parseInt(localStorage.getItem('decimalPlaces') || '2'),
-        thousandsSeparator: localStorage.getItem('thousandsSeparator') || ',',
-        decimalSeparator: localStorage.getItem('decimalSeparator') || '.',
+        globalCurrency: getUserSetting('globalCurrency', 'USD'),
+        currencySymbol: getUserSetting('currencySymbol', '$'),
+        currencyPosition: getUserSetting('currencyPosition', 'before'),
+        decimalPlaces: getUserSetting('decimalPlaces', 2),
+        thousandsSeparator: getUserSetting('thousandsSeparator', ','),
+        decimalSeparator: getUserSetting('decimalSeparator', '.'),
 
         // Theme Settings
-        theme: themeConfig.theme || 'light',
-        primaryColor: themeConfig.primaryColor || '#4361ee',
-        sidebarCollapsed: themeConfig.sidebar === 'collapsed' || false,
-        rtlMode: themeConfig.rtlClass === 'rtl',
+        theme: getUserSetting('theme', themeConfig.theme || 'light'),
+        primaryColor: getUserSetting('primaryColor', themeConfig.primaryColor || '#4361ee'),
+        sidebarCollapsed: getUserSetting('sidebarCollapsed', themeConfig.sidebar === true || themeConfig.sidebar === 'true' || false),
+        rtlMode: getUserSetting('rtlMode', themeConfig.rtlClass === 'rtl'),
 
         // Notification Settings
-        emailNotifications: true,
-        pushNotifications: true,
-        smsNotifications: false,
-        notificationSound: true,
-        notificationFrequency: 'immediate',
+        emailNotifications: getUserSetting('emailNotifications', true),
+        pushNotifications: getUserSetting('pushNotifications', true),
+        smsNotifications: getUserSetting('smsNotifications', false),
+        notificationSound: getUserSetting('notificationSound', true),
+        notificationFrequency: getUserSetting('notificationFrequency', 'immediate'),
 
         // Security Settings
-        twoFactorAuth: false,
-        sessionTimeout: 30,
-        passwordExpiry: 90,
-        loginAttempts: 5,
-        ipWhitelist: [],
+        twoFactorAuth: getUserSetting('twoFactorAuth', false),
+        sessionTimeout: getUserSetting('sessionTimeout', 30),
+        passwordExpiry: getUserSetting('passwordExpiry', 90),
+        loginAttempts: getUserSetting('loginAttempts', 5),
+        ipWhitelist: getUserSetting('ipWhitelist', []),
 
         // API Settings
-        apiEnvironment: 'prod', // 'dev', 'qa', 'prod'
-        apiRateLimit: 1000,
-        apiTimeout: 30,
-        enableApiLogging: true,
-        corsOrigins: ['*'],
-        customApiEndpoints: {
+        apiEnvironment: getUserSetting('apiEnvironment', 'prod'),
+        apiRateLimit: getUserSetting('apiRateLimit', 1000),
+        apiTimeout: getUserSetting('apiTimeout', 30),
+        enableApiLogging: getUserSetting('enableApiLogging', true),
+        corsOrigins: getUserSetting('corsOrigins', ['*']),
+        customApiEndpoints: getUserSetting('customApiEndpoints', {
             dev: 'https://garnishment-backend-6lzi.onrender.com',
             qa: 'https://garnishment-backend-6lzi.onrender.com',
             prod: 'https://garnishedge-be.onrender.com'
-        },
+        }),
 
         // Data Settings
-        dataRetention: 365,
-        autoBackup: true,
-        backupFrequency: 'daily',
-        enableAuditLog: true,
+        dataRetention: getUserSetting('dataRetention', 365),
+        autoBackup: getUserSetting('autoBackup', true),
+        backupFrequency: getUserSetting('backupFrequency', 'daily'),
+        enableAuditLog: getUserSetting('enableAuditLog', true),
     });
 
     const handleSettingChange = (category: string, key: string, value: any) => {
@@ -94,6 +113,9 @@ const Settings = () => {
             [key]: value
         }));
 
+        // Save setting to user-specific storage
+        setUserSetting(key, value);
+
         // Apply theme changes immediately for better UX
         if (category === 'theme' && key === 'theme') {
             dispatch(toggleTheme(value));
@@ -101,7 +123,8 @@ const Settings = () => {
 
         // Apply sidebar changes immediately
         if (category === 'theme' && key === 'sidebarCollapsed') {
-            if (value !== themeConfig.sidebar) {
+            const currentSidebar = themeConfig.sidebar === true || themeConfig.sidebar === 'true';
+            if (value !== currentSidebar) {
                 dispatch(toggleSidebar());
             }
         }
@@ -128,14 +151,12 @@ const Settings = () => {
 
         // Apply UI menu visibility changes immediately
         if (category === 'general' && key === 'showUserInterfaceMenu') {
-            localStorage.setItem('showUserInterfaceMenu', value.toString());
             // Dispatch custom event to notify sidebar
             window.dispatchEvent(new CustomEvent('uiMenuVisibilityChanged', { detail: { visible: value } }));
         }
 
         // Apply timezone changes immediately
         if (category === 'general' && key === 'timezone') {
-            localStorage.setItem('userTimezone', value);
             // Dispatch custom event to notify sidebar footer
             window.dispatchEvent(new CustomEvent('timezoneChanged', { detail: { timezone: value } }));
         }
@@ -159,6 +180,13 @@ const Settings = () => {
                     thousandsSeparator: preset.thousandsSeparator || prev.thousandsSeparator,
                     decimalSeparator: preset.decimalSeparator || prev.decimalSeparator
                 }));
+
+                // Save preset values to user-specific storage
+                setUserSetting('currencySymbol', preset.symbol || settings.currencySymbol);
+                setUserSetting('currencyPosition', preset.position || settings.currencyPosition);
+                setUserSetting('decimalPlaces', preset.decimalPlaces || settings.decimalPlaces);
+                setUserSetting('thousandsSeparator', preset.thousandsSeparator || settings.thousandsSeparator);
+                setUserSetting('decimalSeparator', preset.decimalSeparator || settings.decimalSeparator);
             }
             // Dispatch currency change event
             window.dispatchEvent(new CustomEvent('currencyChanged'));
@@ -243,9 +271,9 @@ class ApiService {
             window.URL.revokeObjectURL(url);
             document.body.removeChild(a);
 
-            // Save environment to localStorage
-            localStorage.setItem('apiEnvironment', settings.apiEnvironment);
-            localStorage.setItem('customApiEndpoints', JSON.stringify(settings.customApiEndpoints));
+            // Save environment to user-specific storage
+            setUserSetting('apiEnvironment', settings.apiEnvironment);
+            setUserSetting('customApiEndpoints', settings.customApiEndpoints);
 
             showSuccessMessage('ApiService.ts configuration downloaded successfully!');
         } catch (error) {
@@ -275,6 +303,26 @@ class ApiService {
         }
     };
 
+    const handleClearUserSettings = () => {
+        const userId = localStorage.getItem('user-id') || 'default-user';
+        const keysToRemove = [
+            'companyName', 'companyEmail', 'userTimezone', 'dateFormat', 'timeFormat', 'language', 'showUserInterfaceMenu',
+            'globalCurrency', 'currencySymbol', 'currencyPosition', 'decimalPlaces', 'thousandsSeparator', 'decimalSeparator',
+            'theme', 'primaryColor', 'sidebarCollapsed', 'rtlMode',
+            'emailNotifications', 'pushNotifications', 'smsNotifications', 'notificationSound', 'notificationFrequency',
+            'twoFactorAuth', 'sessionTimeout', 'passwordExpiry', 'loginAttempts', 'ipWhitelist',
+            'apiEnvironment', 'apiRateLimit', 'apiTimeout', 'enableApiLogging', 'corsOrigins', 'customApiEndpoints',
+            'dataRetention', 'autoBackup', 'backupFrequency', 'enableAuditLog'
+        ];
+
+        keysToRemove.forEach(key => {
+            localStorage.removeItem(`${key}-${userId}`);
+        });
+
+        showSuccessMessage('All user settings cleared successfully!');
+        window.location.reload();
+    };
+
     const handleSaveSettings = async () => {
         setIsLoading(true);
         try {
@@ -302,19 +350,19 @@ class ApiService {
             }
 
             // Save API environment settings
-            localStorage.setItem('apiEnvironment', settings.apiEnvironment);
-            localStorage.setItem('customApiEndpoints', JSON.stringify(settings.customApiEndpoints));
+            setUserSetting('apiEnvironment', settings.apiEnvironment);
+            setUserSetting('customApiEndpoints', settings.customApiEndpoints);
 
             // Save UI menu visibility setting
-            localStorage.setItem('showUserInterfaceMenu', settings.showUserInterfaceMenu.toString());
+            setUserSetting('showUserInterfaceMenu', settings.showUserInterfaceMenu);
 
             // Save Global Currency Settings
-            localStorage.setItem('globalCurrency', settings.globalCurrency);
-            localStorage.setItem('currencySymbol', settings.currencySymbol);
-            localStorage.setItem('currencyPosition', settings.currencyPosition);
-            localStorage.setItem('decimalPlaces', settings.decimalPlaces.toString());
-            localStorage.setItem('thousandsSeparator', settings.thousandsSeparator);
-            localStorage.setItem('decimalSeparator', settings.decimalSeparator);
+            setUserSetting('globalCurrency', settings.globalCurrency);
+            setUserSetting('currencySymbol', settings.currencySymbol);
+            setUserSetting('currencyPosition', settings.currencyPosition);
+            setUserSetting('decimalPlaces', settings.decimalPlaces);
+            setUserSetting('thousandsSeparator', settings.thousandsSeparator);
+            setUserSetting('decimalSeparator', settings.decimalSeparator);
 
             showSuccessMessage('Settings saved successfully!');
         } catch (error) {
@@ -566,7 +614,7 @@ class ApiService {
                     <label className="flex items-center">
                         <input
                             type="checkbox"
-                            checked={themeConfig.sidebar === 'collapsed'}
+                            checked={themeConfig.sidebar === true || themeConfig.sidebar === 'true'}
                             onChange={(e) => handleSettingChange('theme', 'sidebarCollapsed', e.target.checked)}
                             className="form-checkbox"
                         />
@@ -998,16 +1046,33 @@ class ApiService {
             <div className="pt-5">
                 <div className="panel">
                     <div className="flex items-center justify-between mb-5">
-                        <h5 className="font-semibold text-lg dark:text-white-light">Global Settings</h5>
-                        <button
-                            type="button"
-                            onClick={handleSaveSettings}
-                            disabled={isLoading}
-                            className="btn btn-primary flex items-center gap-2"
-                        >
-                            <IconSave className="w-4 h-4" />
-                            {isLoading ? 'Saving...' : 'Save Settings'}
-                        </button>
+                        <div className="flex items-center gap-4">
+                            <h5 className="font-semibold text-lg dark:text-white-light">User Settings</h5>
+                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                <IconUser className="w-4 h-4" />
+                                <span>User: {localStorage.getItem('user-id') || 'default-user'}</span>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <button
+                                type="button"
+                                onClick={handleClearUserSettings}
+                                className="btn btn-outline-danger btn-sm flex items-center gap-2"
+                                title="Clear all settings for current user"
+                            >
+                                <IconLock className="w-4 h-4" />
+                                Clear Settings
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleSaveSettings}
+                                disabled={isLoading}
+                                className="btn btn-primary flex items-center gap-2"
+                            >
+                                <IconSave className="w-4 h-4" />
+                                {isLoading ? 'Saving...' : 'Save Settings'}
+                            </button>
+                        </div>
                     </div>
 
                     <div className="flex flex-wrap gap-2 mb-5">

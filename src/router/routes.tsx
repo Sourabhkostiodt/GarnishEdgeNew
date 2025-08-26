@@ -4,8 +4,10 @@ const Analytics = lazy(() => import('../pages/Analytics'));
 import ProtectedRoute from '../components/ProtectedRoute';
 import Error404 from '../pages/Pages/Error404';
 import Employee from '../pages/Apps/Garnishment/Employee';
+import EmployeeCard from '../pages/Apps/Garnishment/EmployeeCard';
 import Order from '../pages/Apps/Garnishment/Order';
 import IWOProcess from '../pages/Apps/Garnishment/IWOProcess';
+import ACH from '../pages/Apps/Garnishment/ACH';
 import ChildSupport from '../pages/Apps/Rules/ChildSupport';
 import StateTaxLevy from '../pages/Apps/Rules/StateTaxLevy';
 import CreditorDebt from '../pages/Apps/Rules/CreditorDebt';
@@ -232,6 +234,14 @@ const routes = [
         ),
     },
     {
+        path: '/apps/garnishment/employee-card',
+        element: (
+            <ProtectedRoute>
+                <EmployeeCard />
+            </ProtectedRoute>
+        ),
+    },
+    {
         path: '/apps/garnishment/order',
         element: (
             <ProtectedRoute>
@@ -244,6 +254,14 @@ const routes = [
         element: (
             <ProtectedRoute>
                 <IWOProcess />
+            </ProtectedRoute>
+        ),
+    },
+    {
+        path: '/apps/garnishment/ach',
+        element: (
+            <ProtectedRoute>
+                <ACH />
             </ProtectedRoute>
         ),
     },

@@ -157,7 +157,15 @@ const Sidebar = () => {
                                         <NavLink to="/apps/garnishment/employee" className="group">
                                             <div className="flex items-center">
                                                 <IconMenuTodo className="group-hover:!text-primary shrink-0" />
-                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{('Employee')}</span>
+                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{('Employee List')}</span>
+                                            </div>
+                                        </NavLink>
+                                    </li>
+                                    <li className="nav-item">
+                                        <NavLink to="/apps/garnishment/employee-card" className="group">
+                                            <div className="flex items-center">
+                                                <IconMenuTodo className="group-hover:!text-primary shrink-0" />
+                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{('Employee Cards')}</span>
                                             </div>
                                         </NavLink>
                                     </li>
@@ -174,6 +182,14 @@ const Sidebar = () => {
                                             <div className="flex items-center">
                                                 <IconCloudDownload className="group-hover:!text-primary shrink-0" />
                                                 <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{('IWO Process')}</span>
+                                            </div>
+                                        </NavLink>
+                                    </li>
+                                    <li className="nav-item">
+                                        <NavLink to="/apps/garnishment/ach" className="group mt-1">
+                                            <div className="flex items-center">
+                                                <IconMenuInvoice className="group-hover:!text-primary shrink-0" />
+                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{('ACH')}</span>
                                             </div>
                                         </NavLink>
                                     </li>
@@ -259,13 +275,21 @@ const Sidebar = () => {
 
                                     <h2 className="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
                                         <IconMinus className="w-4 h-5 flex-none hidden" />
-                                        <span>{t('Settings')}</span>
+                                        <span>Appearance</span>
                                     </h2>
                                     <li className="nav-item">
                                         <NavLink to="/settings" className="group">
                                             <div className="flex items-center">
                                                 <IconSettings className="group-hover:!text-primary shrink-0" />
-                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Global Settings</span>
+                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Settings</span>
+                                            </div>
+                                        </NavLink>
+                                    </li>
+                                    <li className="nav-item">
+                                        <NavLink to="/widgets" className="group">
+                                            <div className="flex items-center">
+                                                <IconMenuWidgets className="group-hover:!text-primary shrink-0" />
+                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Widgets</span>
                                             </div>
                                         </NavLink>
                                     </li>
